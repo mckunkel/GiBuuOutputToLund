@@ -19,7 +19,7 @@ import java.io.PrintWriter;
  *  `------'
 */
 
-public class OpenCloseLundFileImpl implements OpenCloseLundFile {
+public class OpenCloseLundFileImpl {// implements OpenCloseLundFile
 
 	private String outputLundName;
 	private FileWriter fw = null;
