@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Random;
 
 import org.jlab.clas.pdg.PDGParticle;
+import org.jlab.clas.physics.LorentzVector;
 
 public class ReadGiBuuOutput {
 
@@ -36,6 +37,7 @@ public class ReadGiBuuOutput {
 
 	private List<LundHeader> lundHeader;
 	private List<LundParticle> lundParts;
+	private List<LorentzVector> particles;
 
 	private int setmotherPID;
 	private boolean skimFile = false;
@@ -71,6 +73,8 @@ public class ReadGiBuuOutput {
 		chunks = new ArrayList<List<String>>();
 		lundHeader = new ArrayList<LundHeader>();
 		lundParts = new ArrayList<LundParticle>();
+
+		particles = new ArrayList<LorentzVector>();
 	}
 
 	public void runConversion() {
@@ -182,6 +186,12 @@ public class ReadGiBuuOutput {
 			boolean skimmed = skimmer();
 
 			if (skimmed) {
+				System.out.println("before");
+
+				// printMass(lundParts);
+				printIVMass(lundParts);
+
+				System.out.println("after");
 				rotateIntoYPlane(lundParts);
 
 				// System.out.println("before scatter rotation " +
@@ -199,11 +209,18 @@ public class ReadGiBuuOutput {
 				// + lundParts.get(lundParts.size() - 1).getPy() + " magMomenta
 				// "
 				// + lundParts.get(lundParts.size() - 1).getMag());
+				// createLorentzList(lundParts);
+				// printMass(lundParts);
+				// printIVMass(lundParts);
 				writeFile();
 			}
 
-		} else
+		} else {
+			rotateIntoYPlane(lundParts);
+			rotateScatteredLepton(lundParts);
+
 			writeFile();
+		}
 
 	}
 
@@ -260,6 +277,79 @@ public class ReadGiBuuOutput {
 		}
 		return false;
 
+	}
+
+	private void createLorentzList(List<LundParticle> aList) {
+		for (LundParticle lp : aList) {
+			particles.add(lp.vector());
+		}
+
+	}
+
+	private void printMass(List<LundParticle> aList) {
+		// System.out.println(aList.get(0));
+		// System.out.println(aList.get(4));
+		LorentzVector lbeam = new LorentzVector();
+		LorentzVector ltarger = new LorentzVector();
+		lbeam.setPxPyPzE(0.0, 0.0, 10.6, 10.6);
+		ltarger.setPxPyPzE(0.0, 0.0, 0.0, 0.938);
+
+		lbeam.add(ltarger);
+		lbeam.sub(aList.get(0).vector());
+		lbeam.sub(aList.get(4).vector());
+
+		System.out.println(lbeam.mass() + "  mass ????");
+	}
+
+	private void printIVMass(List<LundParticle> aList) {
+
+		LorentzVector lbeam = new LorentzVector();
+		LorentzVector ltarget = new LorentzVector();
+		lbeam.setPxPyPzE(0.0, 0.0, 10.6, 10.6);
+		ltarget.setPxPyPzE(0.0, 0.0, 0.0, 0.938);
+		LorentzVector lpscatter = new LorentzVector();
+		LorentzVector lelscatter = new LorentzVector();
+
+		LorentzVector l1 = new LorentzVector();
+		LorentzVector l2 = new LorentzVector();
+		LorentzVector l3 = new LorentzVector();
+
+		int placer = 0;
+		for (LundParticle lundParticle : aList) {
+			if (lundParticle.getPid() == 11 && placer != 4) {
+				l1 = lundParticle.vector();
+			}
+			if (lundParticle.getPid() == 11 && placer == 4) {
+				lelscatter = lundParticle.vector();
+			}
+			if (lundParticle.getPid() == 2212) {
+				lpscatter = lundParticle.vector();
+			}
+			if (lundParticle.getPid() == -11) {
+				l2 = lundParticle.vector();
+			}
+			if (lundParticle.getPid() == 22) {
+				l3 = lundParticle.vector();
+			}
+			placer++;
+		}
+
+		l1.add(l2);
+		l1.add(l3);
+
+		lbeam.add(ltarget);
+		lbeam.sub(lpscatter);
+		lbeam.sub(lelscatter);
+		lbeam.sub(l1);
+		System.out.println(l1.mass() + " IV mass ???? " + lbeam.mass() + " mm ???");
+		//
+		// if (Math.abs(l1.mass() - 0.9578447451185326) > 0.01) {
+		// for (LundParticle lundParticle : aList) {
+		// System.out.println(lundParticle);
+		//
+		// }
+		//
+		// }
 	}
 
 	private void rotateIntoYPlane(List<LundParticle> aList) {

@@ -90,9 +90,20 @@ public class GiBUUDatabase {
 		particleMap.put(new GiBUUParticle(33, -1), new PDGParticle("Sigma-", 3112, 1.189, -1));
 		particleMap.put(new GiBUUParticle(-33, 1), new PDGParticle("antiSigma-", -3112, 1.189, 1));
 
-		particleMap.put(new GiBUUParticle(53, -1), new PDGParticle("Chi-", 3312, 1.315, -1));
-		particleMap.put(new GiBUUParticle(-53, 1), new PDGParticle("antiChi-", -3312, 1.315, 1));
-		particleMap.put(new GiBUUParticle(53, 0), new PDGParticle("Chi0", 3322, 1.315, 0));
+		particleMap.put(new GiBUUParticle(53, -1), new PDGParticle("Xi-", 3312, 1.315, -1));
+		particleMap.put(new GiBUUParticle(-53, 1), new PDGParticle("antiXi-", -3312, 1.315, 1));
+		particleMap.put(new GiBUUParticle(53, 0), new PDGParticle("Xi0", 3322, 1.315, 0));
+		particleMap.put(new GiBUUParticle(-53, 0), new PDGParticle("Xi0", 3322, 1.315, 0));// Note
+																							// this
+																							// is
+																							// not
+																							// in
+																							// the
+																							// CLAS
+																							// PDG
+																							// database
+																							// for
+																							// antiXi0
 
 		return particleMap;
 	}
