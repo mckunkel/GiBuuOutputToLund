@@ -22,6 +22,7 @@ import java.util.Random;
 
 import org.jlab.clas.pdg.PDGParticle;
 import org.jlab.clas.physics.LorentzVector;
+import org.jlab.clas.physics.Particle;
 
 public class ReadGiBuuOutput {
 
@@ -181,19 +182,20 @@ public class ReadGiBuuOutput {
 	private void createLundFile() {
 		// rotate scattered lepton around z-axis angle 0<theta<2pi
 		// rotateIntoYPlane(lundParts);
-
+		// System.out.println(" Invariant EpEmGam.mass " + IVEpEmGam.mass() + "
+		// mxPEscat " + MxPElScat.mass() + " mxpEmEpEm "
+		// + MxPElScatEpEm.mass() + " mxPEmEpEmGam " + MxPElScatEpEmGam.mass() +
+		// " proton mass? "
+		// + MxElScatEpEmGam.mass() + " recoilPmass" + recoilP.mass());
 		if (skimFile) {
 			boolean skimmed = skimmer();
 
 			if (skimmed) {
-				System.out.println("before");
 
-				// printMass(lundParts);
-				printIVMass(lundParts);
-
-				System.out.println("after");
 				rotateIntoYPlane(lundParts);
 
+				rotateScatteredLepton(lundParts);
+				// printMass(lundParts);
 				// System.out.println("before scatter rotation " +
 				// lundParts.get(lundParts.size() - 1) + " "
 				// + lundParts.get(lundParts.size() - 1).getPhi() + " "
@@ -201,7 +203,7 @@ public class ReadGiBuuOutput {
 				// + lundParts.get(lundParts.size() - 1).getPy() + " magMomenta
 				// "
 				// + lundParts.get(lundParts.size() - 1).getMag());
-				rotateScatteredLepton(lundParts);
+
 				// System.out.println("After scatter rotation " +
 				// lundParts.get(lundParts.size() - 1) + " "
 				// + lundParts.get(lundParts.size() - 1).getPhi() + " "
@@ -210,14 +212,13 @@ public class ReadGiBuuOutput {
 				// "
 				// + lundParts.get(lundParts.size() - 1).getMag());
 				// createLorentzList(lundParts);
-				// printMass(lundParts);
 				// printIVMass(lundParts);
 				writeFile();
 			}
 
 		} else {
-			rotateIntoYPlane(lundParts);
-			rotateScatteredLepton(lundParts);
+			// rotateIntoYPlane(lundParts);
+			// rotateScatteredLepton(lundParts);
 
 			writeFile();
 		}
@@ -287,61 +288,71 @@ public class ReadGiBuuOutput {
 	}
 
 	private void printMass(List<LundParticle> aList) {
-		// System.out.println(aList.get(0));
-		// System.out.println(aList.get(4));
-		LorentzVector lbeam = new LorentzVector();
-		LorentzVector ltarger = new LorentzVector();
-		lbeam.setPxPyPzE(0.0, 0.0, 10.6, 10.6);
-		ltarger.setPxPyPzE(0.0, 0.0, 0.0, 0.938);
+		// public Particle(int pid, double px, double py, double pz, double vx,
+		// double vy, double vz) {
 
-		lbeam.add(ltarger);
-		lbeam.sub(aList.get(0).vector());
-		lbeam.sub(aList.get(4).vector());
-
-		System.out.println(lbeam.mass() + "  mass ????");
-	}
-
-	private void printIVMass(List<LundParticle> aList) {
-
-		LorentzVector lbeam = new LorentzVector();
-		LorentzVector ltarget = new LorentzVector();
-		lbeam.setPxPyPzE(0.0, 0.0, 10.6, 10.6);
-		ltarget.setPxPyPzE(0.0, 0.0, 0.0, 0.938);
-		LorentzVector lpscatter = new LorentzVector();
-		LorentzVector lelscatter = new LorentzVector();
-
-		LorentzVector l1 = new LorentzVector();
-		LorentzVector l2 = new LorentzVector();
-		LorentzVector l3 = new LorentzVector();
+		Particle beam = new Particle(11, 0.0, 0.0, 12.0, 0.0, 0.0, 0.0);// 11.991
+		Particle target = new Particle(2212, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
+		Particle scatElectron = new Particle();
+		Particle recoilP = new Particle();
+		Particle dalitzElectron = new Particle();
+		Particle dalitzPositron = new Particle();
+		Particle dalitzPhoton = new Particle();
 
 		int placer = 0;
 		for (LundParticle lundParticle : aList) {
+
 			if (lundParticle.getPid() == 11 && placer != 4) {
-				l1 = lundParticle.vector();
+				dalitzElectron.setVector(11, lundParticle.vector().px(), lundParticle.vector().py(),
+						lundParticle.vector().pz(), 0.0, 0.0, 0.0);
 			}
 			if (lundParticle.getPid() == 11 && placer == 4) {
-				lelscatter = lundParticle.vector();
+				scatElectron.setVector(11, lundParticle.vector().px(), lundParticle.vector().py(),
+						lundParticle.vector().pz(), 0.0, 0.0, 0.0);
 			}
 			if (lundParticle.getPid() == 2212) {
-				lpscatter = lundParticle.vector();
+				recoilP.setVector(2212, lundParticle.vector().px(), lundParticle.vector().py(),
+						lundParticle.vector().pz(), 0.0, 0.0, 0.0);
 			}
 			if (lundParticle.getPid() == -11) {
-				l2 = lundParticle.vector();
+				dalitzPositron.setVector(-11, lundParticle.vector().px(), lundParticle.vector().py(),
+						lundParticle.vector().pz(), 0.0, 0.0, 0.0);
 			}
 			if (lundParticle.getPid() == 22) {
-				l3 = lundParticle.vector();
+				dalitzPhoton.setVector(22, lundParticle.vector().px(), lundParticle.vector().py(),
+						lundParticle.vector().pz(), 0.0, 0.0, 0.0);
 			}
 			placer++;
 		}
+		Particle IVEpEmGam = new Particle();
+		IVEpEmGam.copy(dalitzElectron);
+		IVEpEmGam.combine(dalitzPositron, +1);
+		IVEpEmGam.combine(dalitzPhoton, +1);
 
-		l1.add(l2);
-		l1.add(l3);
+		Particle MxPElScat = new Particle();
+		MxPElScat.copy(beam);
+		MxPElScat.combine(target, +1);
+		MxPElScat.combine(recoilP, -1);
+		MxPElScat.combine(scatElectron, -1);
 
-		lbeam.add(ltarget);
-		lbeam.sub(lpscatter);
-		lbeam.sub(lelscatter);
-		lbeam.sub(l1);
-		System.out.println(l1.mass() + " IV mass ???? " + lbeam.mass() + " mm ???");
+		Particle MxPElScatEpEm = new Particle();
+		MxPElScatEpEm.copy(MxPElScat);
+		MxPElScatEpEm.combine(dalitzElectron, -1);
+		MxPElScatEpEm.combine(dalitzPositron, -1);
+
+		Particle MxPElScatEpEmGam = new Particle();
+		MxPElScatEpEmGam.copy(MxPElScatEpEm);
+		MxPElScatEpEmGam.combine(dalitzPhoton, -1);
+
+		Particle MxElScatEpEmGam = new Particle();
+		MxElScatEpEmGam.copy(MxPElScatEpEmGam);
+		MxElScatEpEmGam.combine(recoilP, +1);
+
+		System.out.println(IVEpEmGam.mass() + "    " + MxPElScat.mass() + "    " + MxPElScatEpEm.mass() + "    "
+				+ MxPElScatEpEmGam.mass() + "    " + MxElScatEpEmGam.mass() + "    " + recoilP.mass());
+		// System.out.println(scatElectron.mass() + " scatter mass ???? " +
+		// scatElectron.e() + " energy ???" + scatpt);
+
 		//
 		// if (Math.abs(l1.mass() - 0.9578447451185326) > 0.01) {
 		// for (LundParticle lundParticle : aList) {
@@ -363,8 +374,10 @@ public class ReadGiBuuOutput {
 	private void rotateScatteredLepton(List<LundParticle> aList) {
 		Random rn = new Random();
 		double newAngle = (2.0 * Math.PI) * rn.nextDouble();
-		LundParticle lParticle = aList.get(aList.size() - 1);
-		aList.set(aList.indexOf(lParticle), lParticle.rotateZ(newAngle));
+		for (LundParticle lp : aList) {
+			LundParticle lp2 = lp.rotateZ(newAngle);
+			aList.set(aList.indexOf(lp), lp2);
+		}
 	}
 
 	private int getNParticles() {
