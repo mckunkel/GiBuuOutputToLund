@@ -80,6 +80,8 @@ public class ReadGiBuuOutput {
 
 	public void runConversion() {
 		readFile();
+		openCloseLundFile.closeLundFile();
+		System.out.println("Finished with " + eventsDone + " closing file " + outputFileName);
 	}
 
 	public void runConversion(int motherPID) {
@@ -87,6 +89,7 @@ public class ReadGiBuuOutput {
 		this.skimFile = true;
 		readFile();
 		openCloseLundFile.closeLundFile();
+		System.out.println("Finished with " + eventsDone + " closing file " + outputFileName);
 
 	}
 
@@ -217,8 +220,9 @@ public class ReadGiBuuOutput {
 			}
 
 		} else {
-			// rotateIntoYPlane(lundParts);
-			// rotateScatteredLepton(lundParts);
+			rotateIntoYPlane(lundParts);
+
+			rotateScatteredLepton(lundParts);
 
 			writeFile();
 		}
@@ -228,11 +232,14 @@ public class ReadGiBuuOutput {
 	private void writeFile() {
 		for (LundHeader lh : lundHeader) {
 			if (eventsDone == nEventsOut) {
+				System.out.println("Finished with " + eventsDone + " closing file " + outputFileName);
 				eventsDone = 0;
 				lundPartNum++;
 				openCloseLundFile.closeLundFile();
 				outputFileName = outputFileName.replaceAll((lundPartNum - 1) + "\\.lund", lundPartNum + ".lund");
 				openCloseLundFile.openLundFile(outputFileName);
+				System.out.println("Opening new file " + outputFileName);
+
 			}
 			openCloseLundFile.writeEvent(lh);
 			for (LundParticle lp : lundParts) {

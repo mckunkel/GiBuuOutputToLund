@@ -4,7 +4,7 @@
 	<groupId>com.IKP.Juelich</groupId>
 	<artifactId>GiBuuOutputToLund</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	
+
 	<repositories>
 		<repository>
 			<id>clas12maven</id>
@@ -30,19 +30,29 @@
 					<target>1.8</target>
 				</configuration>
 			</plugin>
-			 <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <version>2.4</version>
-            <configuration>
-                <archive>
-                    <index>true</index>
-                    <manifest>
-                        <mainClass>client.UseGiBuuToLund</mainClass>
-                    </manifest>
-                </archive>
-            </configuration>
-        </plugin>
+			<plugin>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<executions>
+					<execution>
+						<id>build-a</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>client.UseGiBuuToLund</mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>UseGiBuuToLund.jar</finalName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 </project>
